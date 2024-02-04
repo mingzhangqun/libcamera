@@ -30,7 +30,7 @@ endif
 # libcamera must be built first as a dependency to the other components.
 subdir('libcamera')
 
-subdir('android')
+#subdir('android')
 subdir('ipa')
 
 subdir('apps')
