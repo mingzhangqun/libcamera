@@ -42,6 +42,7 @@ public:
 	IpaVc4()
 		: IpaBase(), lsTable_(nullptr)
 	{
+		printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	}
 
 	~IpaVc4()
@@ -86,6 +87,7 @@ int32_t IpaVc4::platformInit([[maybe_unused]] const InitParams &params, [[maybe_
 {
 	const std::string &target = controller_.getTarget();
 
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	if (target != "bcm2835") {
 		LOG(IPARPI, Error)
 			<< "Tuning data file target returned \"" << target << "\""
@@ -104,6 +106,7 @@ int32_t IpaVc4::platformStart([[maybe_unused]] const ControlList &controls,
 
 int32_t IpaVc4::platformConfigure(const ConfigParams &params, [[maybe_unused]] ConfigResult *result)
 {
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	ispCtrls_ = params.ispControls;
 	if (!validateIspControls()) {
 		LOG(IPARPI, Error) << "ISP control validation failed.";
@@ -139,6 +142,7 @@ void IpaVc4::platformPrepareIsp([[maybe_unused]] const PrepareParams &params,
 {
 	ControlList ctrls(ispCtrls_);
 
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	/* Lock the metadata buffer to avoid constant locks/unlocks. */
 	std::unique_lock<RPiController::Metadata> lock(rpiMetadata);
 
@@ -198,6 +202,7 @@ RPiController::StatisticsPtr IpaVc4::platformProcessStats(Span<uint8_t> mem)
 {
 	using namespace RPiController;
 
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	const bcm2835_isp_stats *stats = reinterpret_cast<bcm2835_isp_stats *>(mem.data());
 	StatisticsPtr statistics = std::make_shared<Statistics>(Statistics::AgcStatsPos::PreWb,
 								Statistics::ColourStatsPos::PostLsc);
@@ -258,6 +263,7 @@ void IpaVc4::handleControls(const ControlList &controls)
 		{ controls::draft::NoiseReductionModeZSL, RPiController::DenoiseMode::ColourHighQuality },
 	};
 
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	for (auto const &ctrl : controls) {
 		switch (ctrl.first) {
 		case controls::NOISE_REDUCTION_MODE: {
@@ -313,6 +319,7 @@ bool IpaVc4::validateIspControls()
 
 void IpaVc4::applyAWB(const struct AwbStatus *awbStatus, ControlList &ctrls)
 {
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	LOG(IPARPI, Debug) << "Applying WB R: " << awbStatus->gainR << " B: "
 			   << awbStatus->gainB;
 
@@ -324,6 +331,7 @@ void IpaVc4::applyAWB(const struct AwbStatus *awbStatus, ControlList &ctrls)
 
 void IpaVc4::applyDG(const struct AgcPrepareStatus *dgStatus, ControlList &ctrls)
 {
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	ctrls.set(V4L2_CID_DIGITAL_GAIN,
 		  static_cast<int32_t>(dgStatus->digitalGain * 1000));
 }
@@ -332,6 +340,7 @@ void IpaVc4::applyCCM(const struct CcmStatus *ccmStatus, ControlList &ctrls)
 {
 	bcm2835_isp_custom_ccm ccm;
 
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	for (int i = 0; i < 9; i++) {
 		ccm.ccm.ccm[i / 3][i % 3].den = 1000;
 		ccm.ccm.ccm[i / 3][i % 3].num = 1000 * ccmStatus->matrix[i];
@@ -349,6 +358,7 @@ void IpaVc4::applyBlackLevel(const struct BlackLevelStatus *blackLevelStatus, Co
 {
 	bcm2835_isp_black_level blackLevel;
 
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	blackLevel.enabled = 1;
 	blackLevel.black_level_r = blackLevelStatus->blackLevelR;
 	blackLevel.black_level_g = blackLevelStatus->blackLevelG;
@@ -364,6 +374,7 @@ void IpaVc4::applyGamma(const struct ContrastStatus *contrastStatus, ControlList
 	const unsigned int numGammaPoints = controller_.getHardwareConfig().numGammaPoints;
 	struct bcm2835_isp_gamma gamma;
 
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	for (unsigned int i = 0; i < numGammaPoints - 1; i++) {
 		int x = i < 16 ? i * 1024
 			       : (i < 24 ? (i - 16) * 2048 + 16384
@@ -385,6 +396,7 @@ void IpaVc4::applyGEQ(const struct GeqStatus *geqStatus, ControlList &ctrls)
 {
 	bcm2835_isp_geq geq;
 
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	geq.enabled = 1;
 	geq.offset = geqStatus->offset;
 	geq.slope.den = 1000;
@@ -399,6 +411,7 @@ void IpaVc4::applyDenoise(const struct DenoiseStatus *denoiseStatus, ControlList
 {
 	using RPiController::DenoiseMode;
 
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	bcm2835_isp_denoise denoise;
 	DenoiseMode mode = static_cast<DenoiseMode>(denoiseStatus->mode);
 
@@ -437,6 +450,7 @@ void IpaVc4::applySharpen(const struct SharpenStatus *sharpenStatus, ControlList
 {
 	bcm2835_isp_sharpen sharpen;
 
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	sharpen.enabled = 1;
 	sharpen.threshold.num = 1000 * sharpenStatus->threshold;
 	sharpen.threshold.den = 1000;
@@ -464,6 +478,7 @@ void IpaVc4::applyDPC(const struct DpcStatus *dpcStatus, ControlList &ctrls)
 
 void IpaVc4::applyLS(const struct AlscStatus *lsStatus, ControlList &ctrls)
 {
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	/*
 	 * Program lens shading tables into pipeline.
 	 * Choose smallest cell size that won't exceed 63x48 cells.
@@ -521,6 +536,7 @@ void IpaVc4::applyLS(const struct AlscStatus *lsStatus, ControlList &ctrls)
 
 void IpaVc4::applyAF(const struct AfStatus *afStatus, ControlList &lensCtrls)
 {
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	if (afStatus->lensSetting) {
 		ControlValue v(afStatus->lensSetting.value());
 		lensCtrls.set(V4L2_CID_FOCUS_ABSOLUTE, v);
@@ -538,6 +554,7 @@ void IpaVc4::resampleTable(uint16_t dest[], const std::vector<double> &src,
 	 * Precalculate and cache the x sampling locations and phases to
 	 * save recomputing them on every row.
 	 */
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	assert(destW > 1 && destH > 1 && destW <= 64);
 	int xLo[64], xHi[64];
 	double xf[64];

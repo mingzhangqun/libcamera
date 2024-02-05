@@ -234,6 +234,7 @@ int PipelineHandlerVc4::prepareBuffers(Camera *camera)
 	unsigned int numRawBuffers = 0, minIspBuffers = 1;
 	int ret;
 
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	if (data->unicam_[Unicam::Image].getFlags() & StreamFlag::External) {
 		numRawBuffers = data->unicam_[Unicam::Image].getBuffers().size();
 		/*
@@ -350,6 +351,7 @@ int PipelineHandlerVc4::platformRegister(std::unique_ptr<RPi::CameraData> &camer
 {
 	Vc4CameraData *data = static_cast<Vc4CameraData *>(cameraData.get());
 
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	if (!data->dmaHeap_.isValid())
 		return -ENOMEM;
 
@@ -582,6 +584,7 @@ int Vc4CameraData::platformConfigure(const RPi::RPiCameraConfiguration *rpiConfi
 	V4L2VideoDevice *unicam = unicam_[Unicam::Image].dev();
 	V4L2DeviceFormat unicamFormat;
 
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	/*
 	 * See which streams are requested, and route the user
 	 * StreamConfiguration appropriately.
@@ -605,6 +608,7 @@ int Vc4CameraData::platformConfigure(const RPi::RPiCameraConfiguration *rpiConfi
 	if (ret)
 		return ret;
 
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	LOG(RPI, Info) << "Sensor: " << sensor_->id()
 		       << " - Selected sensor format: " << rpiConfig->sensorFormat_
 		       << " - Selected unicam format: " << unicamFormat;
@@ -755,6 +759,7 @@ int Vc4CameraData::platformConfigureIpa(ipa::RPi::ConfigParams &params)
 {
 	params.ispControls = isp_[Isp::Input].dev()->controls();
 
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	/* Allocate the lens shading table via dmaHeap and pass to the IPA. */
 	if (!lsTable_.isValid()) {
 		lsTable_ = SharedFD(dmaHeap_.alloc("ls_grid", ipa::RPi::MaxLsGridSize));
@@ -829,6 +834,7 @@ void Vc4CameraData::ispInputDequeue(FrameBuffer *buffer)
 	if (!isRunning())
 		return;
 
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	LOG(RPI, Debug) << "Stream ISP Input buffer complete"
 			<< ", buffer id " << unicam_[Unicam::Image].getBufferId(buffer)
 			<< ", timestamp: " << buffer->metadata().timestamp;
@@ -857,6 +863,7 @@ void Vc4CameraData::ispOutputDequeue(FrameBuffer *buffer)
 	/* The buffer must belong to one of our ISP output streams. */
 	ASSERT(stream);
 
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	LOG(RPI, Debug) << "Stream " << stream->name() << " buffer complete"
 			<< ", buffer id " << index
 			<< ", timestamp: " << buffer->metadata().timestamp;
@@ -889,6 +896,7 @@ void Vc4CameraData::processStatsComplete(const ipa::RPi::BufferIds &buffers)
 	if (!isRunning())
 		return;
 
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	FrameBuffer *buffer = isp_[Isp::Stats].getBuffers().at(buffers.stats & RPi::MaskID).buffer;
 
 	handleStreamBuffer(buffer, &isp_[Isp::Stats]);
@@ -900,6 +908,7 @@ void Vc4CameraData::processStatsComplete(const ipa::RPi::BufferIds &buffers)
 void Vc4CameraData::prepareIspComplete(const ipa::RPi::BufferIds &buffers,
 				       [[maybe_unused]] bool stitchSwapBuffers)
 {
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	unsigned int embeddedId = buffers.embedded & RPi::MaskID;
 	unsigned int bayer = buffers.bayer & RPi::MaskID;
 	FrameBuffer *buffer;
@@ -926,6 +935,7 @@ void Vc4CameraData::setIspControls(const ControlList &controls)
 {
 	ControlList ctrls = controls;
 
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	if (ctrls.contains(V4L2_CID_USER_BCM2835_ISP_LENS_SHADING)) {
 		ControlValue &value =
 			const_cast<ControlValue &>(ctrls.get(V4L2_CID_USER_BCM2835_ISP_LENS_SHADING));
@@ -958,6 +968,7 @@ void Vc4CameraData::tryRunPipeline()
 	FrameBuffer *embeddedBuffer;
 	BayerFrame bayerFrame;
 
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	/* If any of our request or buffer queues are empty, we cannot proceed. */
 	if (state_ != State::Idle || requestQueue_.empty() ||
 	    bayerQueue_.empty() || (embeddedQueue_.empty() && sensorMetadata_))

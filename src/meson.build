@@ -35,6 +35,6 @@ subdir('ipa')
 
 subdir('apps')
 
-subdir('gstreamer')
-subdir('py')
-subdir('v4l2')
+#subdir('gstreamer')
+#subdir('py')
+#subdir('v4l2')

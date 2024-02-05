@@ -372,6 +372,7 @@ void IpaBase::unmapBuffers(const std::vector<unsigned int> &ids)
 
 void IpaBase::prepareIsp(const PrepareParams &params)
 {
+	printf("[MZQ]%s,%d\n", __func__, __LINE__);
 	applyControls(params.requestControls);
 
 	/*
@@ -467,6 +468,7 @@ void IpaBase::processStats(const ProcessParams &params)
 {
 	unsigned int ipaContext = params.ipaContext % rpiMetadata_.size();
 
+	printf("[MZQ]%s,%d\n", __func__, __LINE__);
 	if (processPending_ && frameCount_ >= mistrustCount_) {
 		RPiController::Metadata &rpiMetadata = rpiMetadata_[ipaContext];
 

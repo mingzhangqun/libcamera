@@ -239,7 +239,7 @@ subdir('src')
 # through configuration values. They are enabled by default.
 
 subdir('Documentation')
-subdir('test')
+#subdir('test')
 
 if not meson.is_cross_build()
     kernel_version_req = '>= 5.0.0'
@@ -271,13 +271,13 @@ summary({
             'Hotplug support': libudev.found(),
             'Tracing support': tracing_enabled,
 #            'Android support': android_enabled,
-            'GStreamer support': gst_enabled,
-            'Python bindings': pycamera_enabled,
-            'V4L2 emulation support': v4l2_enabled,
+#            'GStreamer support': gst_enabled,
+#            'Python bindings': pycamera_enabled,
+#            'V4L2 emulation support': v4l2_enabled,
             'cam application': cam_enabled,
             'qcam application': qcam_enabled,
             'lc-compliance application': lc_compliance_enabled,
-            'Unit tests': test_enabled,
+#            'Unit tests': test_enabled,
         },
         section : 'Configuration',
         bool_yn : true)

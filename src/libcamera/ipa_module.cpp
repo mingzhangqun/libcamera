@@ -259,6 +259,7 @@ IPAModule::IPAModule(const std::string &libPath)
 	: libPath_(libPath), valid_(false), loaded_(false),
 	  dlHandle_(nullptr), ipaCreate_(nullptr)
 {
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	if (loadIPAModuleInfo() < 0)
 		return;
 
@@ -274,6 +275,7 @@ IPAModule::~IPAModule()
 int IPAModule::loadIPAModuleInfo()
 {
 	File file{ libPath_ };
+	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	if (!file.open(File::OpenModeFlag::ReadOnly)) {
 		LOG(IPAModule, Error) << "Failed to open IPA library: "
 				      << strerror(-file.error());
