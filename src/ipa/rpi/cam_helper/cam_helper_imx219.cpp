@@ -65,16 +65,22 @@ CamHelperImx219::CamHelperImx219()
 	: CamHelper({}, frameIntegrationDiff)
 #endif
 {
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 }
 
 uint32_t CamHelperImx219::gainCode(double gain) const
 {
-	return (uint32_t)(256 - 256 / gain);
+	uint32_t gainCode = (uint32_t)(256 - 256 / gain);
+
+	printf("[MZQ]%s, %d, %s: gain=%f => gainCode=%d\n", __FILE__, __LINE__, __func__, gain, gainCode);
+	return gainCode;//(uint32_t)(256 - 256 / gain);
 }
 
 double CamHelperImx219::gain(uint32_t gainCode) const
 {
-	return 256.0 / (256 - gainCode);
+	double gain = 256.0 / (256 - gainCode);
+	printf("[MZQ]%s, %d, %s: gainCode=%d => gain=%f\n", __FILE__, __LINE__, __func__, gainCode, gain);
+	return gain;//256.0 / (256 - gainCode);
 }
 
 unsigned int CamHelperImx219::mistrustFramesModeSwitch() const
@@ -84,11 +90,13 @@ unsigned int CamHelperImx219::mistrustFramesModeSwitch() const
 	 * at a mode switch (though not at start-up). Possibly warrants some
 	 * investigation, though not a big deal.
 	 */
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	return 1;
 }
 
 bool CamHelperImx219::sensorEmbeddedDataPresent() const
 {
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	return ENABLE_EMBEDDED_DATA;
 }
 
@@ -105,10 +113,12 @@ void CamHelperImx219::populateMetadata(const MdParser::RegisterMap &registers,
 	deviceStatus.frameLength = registers.at(frameLengthHiReg) * 256 + registers.at(frameLengthLoReg);
 
 	metadata.set("device.status", deviceStatus);
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 }
 
 static CamHelper *create()
 {
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	return new CamHelperImx219();
 }
 

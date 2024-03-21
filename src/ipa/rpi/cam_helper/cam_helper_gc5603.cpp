@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2020, Raspberry Pi Ltd
  *
- * cam_helper_imx415.cpp - camera helper for imx415 sensor
+ * cam_helper_gc5603.cpp - camera helper for gc5603 sensor
  */
 
 #include <algorithm>
@@ -42,10 +42,10 @@ constexpr std::initializer_list<uint32_t> registerList =
 	{ expHiReg, expLoReg, gainHiReg, gainLoReg, frameLengthHiReg, frameLengthLoReg,
 	  lineLengthHiReg, lineLengthLoReg, temperatureReg };
 
-class CamHelperImx415 : public CamHelper
+class CamHelperGc5603 : public CamHelper
 {
 public:
-	CamHelperImx415();
+	CamHelperGc5603();
 	uint32_t gainCode(double gain) const override;
 	double gain(uint32_t gainCode) const override;
 	void prepare(libcamera::Span<const uint8_t> buffer, Metadata &metadata) override;
@@ -70,25 +70,25 @@ private:
 			      Metadata &metadata) const override;
 };
 
-CamHelperImx415::CamHelperImx415()
+CamHelperGc5603::CamHelperGc5603()
 	: CamHelper(std::make_unique<MdParserSmia>(registerList), frameIntegrationDiff)
 {
 	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 }
 
-uint32_t CamHelperImx415::gainCode(double gain) const
+uint32_t CamHelperGc5603::gainCode(double gain) const
 {
 	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	return static_cast<uint32_t>(1024 - 1024 / gain);
 }
 
-double CamHelperImx415::gain(uint32_t gainCode) const
+double CamHelperGc5603::gain(uint32_t gainCode) const
 {
 	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	return 1024.0 / (1024 - gainCode);
 }
 
-void CamHelperImx415::prepare(libcamera::Span<const uint8_t> buffer, Metadata &metadata)
+void CamHelperGc5603::prepare(libcamera::Span<const uint8_t> buffer, Metadata &metadata)
 {
 	MdParser::RegisterMap registers;
 	DeviceStatus deviceStatus;
@@ -125,7 +125,7 @@ void CamHelperImx415::prepare(libcamera::Span<const uint8_t> buffer, Metadata &m
 	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 }
 
-std::pair<uint32_t, uint32_t> CamHelperImx415::getBlanking(Duration &exposure,
+std::pair<uint32_t, uint32_t> CamHelperGc5603::getBlanking(Duration &exposure,
 							   Duration minFrameDuration,
 							   Duration maxFrameDuration) const
 {
@@ -155,16 +155,16 @@ std::pair<uint32_t, uint32_t> CamHelperImx415::getBlanking(Duration &exposure,
 	if (shift) {
 		/* Account for any rounding in the scaled frame length value. */
 		frameLength <<= shift;
-		exposureLines = CamHelperImx415::exposureLines(exposure, lineLength);
+		exposureLines = CamHelperGc5603::exposureLines(exposure, lineLength);
 		exposureLines = std::min(exposureLines, frameLength - frameIntegrationDiff);
-		exposure = CamHelperImx415::exposure(exposureLines, lineLength);
+		exposure = CamHelperGc5603::exposure(exposureLines, lineLength);
 	}
 
 	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	return { frameLength - mode_.height, hblank };
 }
 
-void CamHelperImx415::getDelays(int &exposureDelay, int &gainDelay,
+void CamHelperGc5603::getDelays(int &exposureDelay, int &gainDelay,
 				int &vblankDelay, int &hblankDelay) const
 {
 	exposureDelay = 2;
@@ -174,13 +174,13 @@ void CamHelperImx415::getDelays(int &exposureDelay, int &gainDelay,
 	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 }
 
-bool CamHelperImx415::sensorEmbeddedDataPresent() const
+bool CamHelperGc5603::sensorEmbeddedDataPresent() const
 {
 	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
 	return true;
 }
 
-void CamHelperImx415::populateMetadata(const MdParser::RegisterMap &registers,
+void CamHelperGc5603::populateMetadata(const MdParser::RegisterMap &registers,
 				       Metadata &metadata) const
 {
 	DeviceStatus deviceStatus;
@@ -200,7 +200,7 @@ void CamHelperImx415::populateMetadata(const MdParser::RegisterMap &registers,
 static CamHelper *create()
 {
 	printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
-	return new CamHelperImx415();
+	return new CamHelperGc5603();
 }
 
-static RegisterCamHelper reg("imx415", &create);
+static RegisterCamHelper reg("gc5603", &create);

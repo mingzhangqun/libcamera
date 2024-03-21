@@ -444,6 +444,18 @@ class CameraSensorHelperImx327 : public CameraSensorHelperImx290
 };
 REGISTER_CAMERA_SENSOR_HELPER("imx327", CameraSensorHelperImx327)
 
+class CameraSensorHelperImx415 : public CameraSensorHelper
+{
+public:
+	CameraSensorHelperImx415()
+	{
+		printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
+		gainType_ = AnalogueGainLinear;
+		gainConstants_.linear = { 0, 1024, -1, 1024 };
+	}
+};
+REGISTER_CAMERA_SENSOR_HELPER("imx415", CameraSensorHelperImx415)
+
 class CameraSensorHelperImx477 : public CameraSensorHelper
 {
 public:
@@ -524,6 +536,18 @@ public:
 	}
 };
 REGISTER_CAMERA_SENSOR_HELPER("ov5670", CameraSensorHelperOv5670)
+
+class CameraSensorHelperGc5603 : public CameraSensorHelper
+{
+public:
+	CameraSensorHelperGc5603()
+	{
+		printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
+		gainType_ = AnalogueGainLinear;
+		gainConstants_.linear = { 0, 1024, -1, 1024 };
+	}
+};
+REGISTER_CAMERA_SENSOR_HELPER("gc5603", CameraSensorHelperGc5603)
 
 class CameraSensorHelperOv5675 : public CameraSensorHelper
 {

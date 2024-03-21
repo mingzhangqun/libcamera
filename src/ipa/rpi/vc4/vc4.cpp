@@ -101,6 +101,7 @@ int32_t IpaVc4::platformInit([[maybe_unused]] const InitParams &params, [[maybe_
 int32_t IpaVc4::platformStart([[maybe_unused]] const ControlList &controls,
 			      [[maybe_unused]] StartResult *result)
 {
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	return 0;
 }
 

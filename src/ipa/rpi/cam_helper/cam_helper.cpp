@@ -128,11 +128,15 @@ std::pair<uint32_t, uint32_t> CamHelper::getBlanking(Duration &exposure,
 				 CamHelper::exposureLines(exposure, lineLength));
 	exposure = CamHelper::exposure(exposureLines, lineLength);
 
+	printf("[MZQ]%s, %d, %s: vblank=%d, hblank=%d\n", __FILE__, __LINE__, __func__, vblank, hblank);
 	return { vblank, hblank };
 }
 
 Duration CamHelper::hblankToLineLength(uint32_t hblank) const
 {
+	printf("[MZQ]%s, %d, %s: hblank=%d, width=%d, pixelRate=%ld\n", __FILE__, __LINE__, __func__,
+		hblank, mode_.width, mode_.pixelRate);
+
 	return (mode_.width + hblank) * (1.0s / mode_.pixelRate);
 }
 

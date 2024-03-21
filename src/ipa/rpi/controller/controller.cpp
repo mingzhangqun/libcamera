@@ -138,6 +138,7 @@ void Controller::initialise()
 
 void Controller::switchMode(CameraMode const &cameraMode, Metadata *metadata)
 {
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	for (auto &algo : algorithms_)
 		algo->switchMode(cameraMode, metadata);
 	switchModeCalled_ = true;

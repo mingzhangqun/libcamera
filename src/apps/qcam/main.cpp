@@ -54,23 +54,29 @@ OptionsParser::Options parseOptions(int argc, char *argv[])
 
 int main(int argc, char **argv)
 {
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	QApplication app(argc, argv);
 	int ret;
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	OptionsParser::Options options = parseOptions(argc, argv);
 	if (!options.valid())
 		return EXIT_FAILURE;
 	if (options.isSet(OptHelp))
 		return 0;
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	MessageHandler msgHandler(options.isSet(OptVerbose));
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	struct sigaction sa = {};
 	sa.sa_handler = &signalHandler;
 	sigaction(SIGINT, &sa, nullptr);
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	CameraManager *cm = new libcamera::CameraManager();
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	ret = cm->start();
 	if (ret) {
 		qInfo() << "Failed to start camera manager:"
@@ -78,13 +84,18 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	MainWindow *mainWindow = new MainWindow(cm, options);
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	mainWindow->show();
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	ret = app.exec();
 	delete mainWindow;
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	cm->stop();
 	delete cm;
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	return ret;
 }

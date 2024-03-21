@@ -365,6 +365,8 @@ int MainWindow::startCapture()
 	std::vector<StreamRole> roles = StreamKeyValueParser::roles(options_[OptStream]);
 	int ret;
 
+	printf("[MZQ]%s, %d, %s: roles.size=%zu\n", __FILE__, __LINE__, __func__, roles.size());
+
 	/* Verify roles are supported. */
 	switch (roles.size()) {
 	case 1:
@@ -640,6 +642,7 @@ void MainWindow::saveImageAs()
 
 	QString filename = QFileDialog::getSaveFileName(this, "Save Image", defaultPath,
 							"Image Files (*.png *.jpg *.jpeg)");
+
 	if (filename.isEmpty())
 		return;
 

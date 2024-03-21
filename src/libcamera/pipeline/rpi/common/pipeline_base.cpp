@@ -305,12 +305,14 @@ CameraConfiguration::Status RPiCameraConfiguration::validate()
 
 bool PipelineHandlerBase::isRgb(const PixelFormat &pixFmt)
 {
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	const PixelFormatInfo &info = PixelFormatInfo::info(pixFmt);
 	return info.colourEncoding == PixelFormatInfo::ColourEncodingRGB;
 }
 
 bool PipelineHandlerBase::isYuv(const PixelFormat &pixFmt)
 {
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	/* The code below would return true for raw mono streams, so weed those out first. */
 	if (PipelineHandlerBase::isRaw(pixFmt))
 		return false;
@@ -321,6 +323,7 @@ bool PipelineHandlerBase::isYuv(const PixelFormat &pixFmt)
 
 bool PipelineHandlerBase::isRaw(const PixelFormat &pixFmt)
 {
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	/* This test works for both Bayer and raw mono formats. */
 	return BayerFormat::fromPixelFormat(pixFmt).isValid();
 }
@@ -402,6 +405,7 @@ PipelineHandlerBase::generateConfiguration(Camera *camera, Span<const StreamRole
 	if (roles.empty())
 		return config;
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	Size sensorSize = data->sensor_->resolution();
 	for (const StreamRole role : roles) {
 		switch (role) {
@@ -509,11 +513,13 @@ int PipelineHandlerBase::configure(Camera *camera, CameraConfiguration *config)
 	CameraData *data = cameraData(camera);
 	int ret;
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	/* Start by freeing all buffers and reset the stream states. */
 	data->freeBuffers();
 	for (auto const stream : data->streams_)
 		stream->clearFlags(StreamFlag::External);
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	/*
 	 * Apply the format on the sensor with any cached transform.
 	 *
@@ -523,6 +529,7 @@ int PipelineHandlerBase::configure(Camera *camera, CameraConfiguration *config)
 	RPiCameraConfiguration *rpiConfig = static_cast<RPiCameraConfiguration *>(config);
 	V4L2SubdeviceFormat *sensorFormat = &rpiConfig->sensorFormat_;
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	if (rpiConfig->sensorConfig) {
 		ret = data->sensor_->applyConfiguration(*rpiConfig->sensorConfig,
 							rpiConfig->combinedTransform_,
@@ -538,10 +545,12 @@ int PipelineHandlerBase::configure(Camera *camera, CameraConfiguration *config)
 	 * Platform specific internal stream configuration. This also assigns
 	 * external streams which get configured below.
 	 */
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	ret = data->platformConfigure(rpiConfig);
 	if (ret)
 		return ret;
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	ipa::RPi::ConfigResult result;
 	ret = data->configureIPA(config, &result);
 	if (ret) {
@@ -876,6 +885,7 @@ int PipelineHandlerBase::registerCamera(std::unique_ptr<RPi::CameraData> &camera
 	if (ret)
 		return ret;
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	ret = data->loadPipelineConfiguration();
 	if (ret) {
 		LOG(RPI, Error) << "Unable to load pipeline configuration";
@@ -1123,16 +1133,19 @@ int CameraData::loadPipelineConfiguration()
 		.cameraTimeoutValue = 0,
 	};
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	/* Initial configuration of the platform, in case no config file is present */
 	platformPipelineConfigure({});
 
 	char const *configFromEnv = utils::secure_getenv("LIBCAMERA_RPI_CONFIG_FILE");
+	printf("[MZQ]%s, %d, %s: %s\n", __FILE__, __LINE__, __func__, configFromEnv);
 	if (!configFromEnv || *configFromEnv == '\0')
 		return 0;
 
 	std::string filename = std::string(configFromEnv);
 	File file(filename);
 
+	printf("[MZQ]%s, %d, %s: filename=%s\n", __FILE__, __LINE__, __func__, filename.c_str());
 	if (!file.open(File::OpenModeFlag::ReadOnly)) {
 		LOG(RPI, Warning) << "Failed to open configuration file '" << filename << "'"
 				  << ", using defaults";
@@ -1175,6 +1188,7 @@ int CameraData::loadIPA(ipa::RPi::InitResult *result)
 {
 	int ret;
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	ipa_ = IPAManager::createIPA<ipa::RPi::IPAProxyRPi>(pipe(), 1, 1);
 
 	if (!ipa_)
@@ -1191,29 +1205,35 @@ int CameraData::loadIPA(ipa::RPi::InitResult *result)
 		if (isMonoSensor(sensor_))
 			model += "_mono";
 		configurationFile = ipa_->configurationFile(model + ".json");
+		printf("[MZQ]%s, %d, %s: %s\n", __FILE__, __LINE__, __func__, configurationFile.c_str());
 	} else {
 		configurationFile = std::string(configFromEnv);
+		printf("[MZQ]%s, %d, %s: %s\n", __FILE__, __LINE__, __func__, configurationFile.c_str());
 	}
 
 	IPASettings settings(configurationFile, sensor_->model());
 	ipa::RPi::InitParams params;
 
+	printf("[MZQ]%s, %d, %s: %s\n", __FILE__, __LINE__, __func__, sensor_->model().c_str());
 	ret = sensor_->sensorInfo(&params.sensorInfo);
 	if (ret) {
 		LOG(RPI, Error) << "Failed to retrieve camera sensor info";
 		return ret;
 	}
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	params.lensPresent = !!sensor_->focusLens();
 	ret = platformInitIpa(params);
 	if (ret)
 		return ret;
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	return ipa_->init(settings, params, result);
 }
 
 int CameraData::configureIPA(const CameraConfiguration *config, ipa::RPi::ConfigResult *result)
 {
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	ipa::RPi::ConfigParams params;
 	int ret;
 
@@ -1253,6 +1273,7 @@ int CameraData::configureIPA(const CameraConfiguration *config, ipa::RPi::Config
 
 void CameraData::metadataReady(const ControlList &metadata)
 {
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	if (!isRunning())
 		return;
 

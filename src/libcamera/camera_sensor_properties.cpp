@@ -111,6 +111,10 @@ const CameraSensorProperties *CameraSensorProperties::get(const std::string &sen
 			.unitCellSize = { 2900, 2900 },
 			.testPatternModes = {},
 		} },
+		{ "imx415", {
+			.unitCellSize = { 1220, 1220 },
+			.testPatternModes = {},
+		} },
 		{ "imx477", {
 			.unitCellSize = { 1550, 1550 },
 			.testPatternModes = {},
@@ -192,6 +196,10 @@ const CameraSensorProperties *CameraSensorProperties::get(const std::string &sen
 		} },
 		{ "ov5647", {
 			.unitCellSize = { 1400, 1400 },
+			.testPatternModes = {},
+		} },
+		{ "gc5603", {
+			.unitCellSize = { 2000, 2000 },
 			.testPatternModes = {},
 		} },
 		{ "ov5670", {

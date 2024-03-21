@@ -119,6 +119,7 @@ int32_t IpaBase::init(const IPASettings &settings, const InitParams &params, Ini
 	 * that the kernel driver doesn't. We only do this the first time; we don't need
 	 * to re-parse the metadata after a simple mode-switch for no reason.
 	 */
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	helper_ = std::unique_ptr<RPiController::CamHelper>(RPiController::CamHelper::create(settings.sensorModel));
 	if (!helper_) {
 		LOG(IPARPI, Error) << "Could not create camera helper for "
@@ -134,12 +135,14 @@ int32_t IpaBase::init(const IPASettings &settings, const InitParams &params, Ini
 	helper_->getDelays(exposureDelay, gainDelay, vblankDelay, hblankDelay);
 	sensorMetadata = helper_->sensorEmbeddedDataPresent();
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	result->sensorConfig.gainDelay = gainDelay;
 	result->sensorConfig.exposureDelay = exposureDelay;
 	result->sensorConfig.vblankDelay = vblankDelay;
 	result->sensorConfig.hblankDelay = hblankDelay;
 	result->sensorConfig.sensorMetadata = sensorMetadata;
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	/* Load the tuning file for this sensor. */
 	int ret = controller_.read(settings.configurationFile.c_str());
 	if (ret) {
@@ -149,21 +152,25 @@ int32_t IpaBase::init(const IPASettings &settings, const InitParams &params, Ini
 		return ret;
 	}
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	lensPresent_ = params.lensPresent;
 
 	controller_.initialise();
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	/* Return the controls handled by the IPA */
 	ControlInfoMap::Map ctrlMap = ipaControls;
 	if (lensPresent_)
 		ctrlMap.merge(ControlInfoMap::Map(ipaAfControls));
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	monoSensor_ = params.sensorInfo.cfaPattern == properties::draft::ColorFilterArrangementEnum::MONO;
 	if (!monoSensor_)
 		ctrlMap.merge(ControlInfoMap::Map(ipaColourControls));
 
 	result->controlInfo = ControlInfoMap(std::move(ctrlMap), controls::controls);
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	return platformInit(params, result);
 }
 
@@ -273,11 +280,14 @@ void IpaBase::start(const ControlList &controls, StartResult *result)
 {
 	RPiController::Metadata metadata;
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	if (!controls.empty()) {
 		/* We have been given some controls to action before start. */
+		printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 		applyControls(controls);
 	}
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	controller_.switchMode(mode_, &metadata);
 
 	/* Reset the frame lengths queue state. */
@@ -290,6 +300,7 @@ void IpaBase::start(const ControlList &controls, StartResult *result)
 	agcStatus.shutterTime = 0.0s;
 	agcStatus.analogueGain = 0.0;
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	metadata.get("agc.status", agcStatus);
 	if (agcStatus.shutterTime && agcStatus.analogueGain) {
 		ControlList ctrls(sensorCtrls_);
@@ -342,11 +353,15 @@ void IpaBase::start(const ControlList &controls, StartResult *result)
 		mistrustCount_ = helper_->mistrustFramesModeSwitch();
 	}
 
+	printf("[MZQ]%s, %d, %s: firstStart_=%d, dropFrameCount_=%d, mistrustCount_=%d\n", __FILE__, __LINE__, __func__, 
+		firstStart_, dropFrameCount_, mistrustCount_);
+
 	result->dropFrameCount = dropFrameCount_;
 
 	firstStart_ = false;
 	lastRunTimestamp_ = 0;
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	platformStart(controls, result);
 }
 
@@ -690,6 +705,7 @@ void IpaBase::applyControls(const ControlList &controls)
 	using RPiController::DenoiseAlgorithm;
 	using RPiController::HdrAlgorithm;
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	/* Clear the return metadata buffer. */
 	libcameraMetadata_.clear();
 

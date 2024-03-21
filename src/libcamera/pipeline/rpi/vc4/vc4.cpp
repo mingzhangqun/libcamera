@@ -536,15 +536,18 @@ int Vc4CameraData::platformPipelineConfigure(const std::unique_ptr<YamlObject> &
 		.output0MandatoryStream = false,
 	};
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	if (!root)
 		return 0;
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	std::optional<double> ver = (*root)["version"].get<double>();
 	if (!ver || *ver != 1.0) {
 		LOG(RPI, Error) << "Unexpected configuration file version reported";
 		return -EINVAL;
 	}
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	std::optional<std::string> target = (*root)["target"].get<std::string>();
 	if (!target || *target != "bcm2835") {
 		LOG(RPI, Error) << "Unexpected target reported: expected \"bcm2835\", got "
@@ -552,6 +555,7 @@ int Vc4CameraData::platformPipelineConfigure(const std::unique_ptr<YamlObject> &
 		return -EINVAL;
 	}
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	const YamlObject &phConfig = (*root)["pipeline_handler"];
 	config_.minUnicamBuffers =
 		phConfig["min_unicam_buffers"].get<unsigned int>(config_.minUnicamBuffers);
@@ -562,15 +566,18 @@ int Vc4CameraData::platformPipelineConfigure(const std::unique_ptr<YamlObject> &
 	config_.output0MandatoryStream =
 		phConfig["output0_mandatory_stream"].get<bool>(config_.output0MandatoryStream);
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	if (config_.minTotalUnicamBuffers < config_.minUnicamBuffers) {
 		LOG(RPI, Error) << "Invalid configuration: min_total_unicam_buffers must be >= min_unicam_buffers";
 		return -EINVAL;
 	}
 
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 	if (config_.minTotalUnicamBuffers < 1) {
 		LOG(RPI, Error) << "Invalid configuration: min_total_unicam_buffers must be >= 1";
 		return -EINVAL;
 	}
+	printf("[MZQ]%s, %d, %s: \n", __FILE__, __LINE__, __func__);
 
 	return 0;
 }
