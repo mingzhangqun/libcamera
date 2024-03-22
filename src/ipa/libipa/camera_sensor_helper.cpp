@@ -549,6 +549,18 @@ public:
 };
 REGISTER_CAMERA_SENSOR_HELPER("gc5603", CameraSensorHelperGc5603)
 
+class CameraSensorHelperGc8613 : public CameraSensorHelper
+{
+public:
+	CameraSensorHelperGc8613()
+	{
+		printf("[MZQ]%s: %s,%d\n", __FILE__, __func__, __LINE__);
+		gainType_ = AnalogueGainLinear;
+		gainConstants_.linear = { 0, 1024, -1, 1024 };
+	}
+};
+REGISTER_CAMERA_SENSOR_HELPER("gc8613", CameraSensorHelperGc8613)
+
 class CameraSensorHelperOv5675 : public CameraSensorHelper
 {
 public:
